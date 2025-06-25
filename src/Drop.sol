@@ -2,6 +2,7 @@
 pragma solidity ^0.8.30;
 
 import {ERC721, ERC165, ERC721TokenReceiver, ERC721Metadata} from "./interfaces/IDrop.sol";
+import {Strings} from "./utils/Strings.sol";
 
 contract Drop is ERC721, ERC165, ERC721TokenReceiver, ERC721Metadata {
     error Drop__InvalidAddress();
@@ -159,11 +160,11 @@ contract Drop is ERC721, ERC165, ERC721TokenReceiver, ERC721Metadata {
     function tokenURI(uint256 _tokenId) public view returns (string memory) {
         address tokenOwner = ownerOf(_tokenId);
 
-        // string memory baseURI = _baseURI();
-        // return
-        //     bytes(baseURI).length > 0
-        //         ? string.concat(baseURI, _tokenId.toString())
-        //         : "";
+        string memory baseURI = _baseURI();
+        return
+            bytes(baseURI).length > 0
+                ? string.concat(baseURI, _tokenId.toString())
+                : "";
 
         return _tokenURIs[_tokenId];
     }
