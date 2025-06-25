@@ -21,8 +21,7 @@ contract Drop is ERC721, ERC165, ERC721TokenReceiver, ERC721Metadata {
     mapping(uint256 tokenId => address) private _owners;
     mapping(address owner => uint256) private _balances;
     mapping(uint256 tokenId => address) private _tokenApprovals;
-    mapping(address owner => mapping(address operator => bool))
-        private _operatorApprovals;
+    mapping(address owner => mapping(address operator => bool)) private _operatorApprovals;
     mapping(uint256 tokenId => string) private _tokenURIs;
 
     constructor(string memory name_, string memory symbol_) {
@@ -56,20 +55,11 @@ contract Drop is ERC721, ERC165, ERC721TokenReceiver, ERC721Metadata {
         return _symbol;
     }
 
-    function safeTransferFrom(
-        address _from,
-        address _to,
-        uint256 _tokenId
-    ) public {
+    function safeTransferFrom(address _from, address _to, uint256 _tokenId) public {
         safeTransferFrom(_from, _to, _tokenId, "");
     }
 
-    function safeTransferFrom(
-        address _from,
-        address _to,
-        uint256 _tokenId,
-        bytes memory _data
-    ) public override {
+    function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes memory _data) public override {
         if (!_operatorApprovals[msg.sender][_to]) {
             revert Drop__Unauthorized();
         }
@@ -77,12 +67,7 @@ contract Drop is ERC721, ERC165, ERC721TokenReceiver, ERC721Metadata {
         _safeTransfer(_from, _to, _tokenId, _data);
     }
 
-    function _safeTransfer(
-        address _from,
-        address _to,
-        uint256 _tokenId,
-        bytes memory _data
-    ) internal virtual {
+    function _safeTransfer(address _from, address _to, uint256 _tokenId, bytes memory _data) internal virtual {
         _transfer(_from, _to, _tokenId);
 
         if (!_checkOnERC721Received(_from, _to, _tokenId, _data)) {
@@ -90,11 +75,7 @@ contract Drop is ERC721, ERC165, ERC721TokenReceiver, ERC721Metadata {
         }
     }
 
-    function transferFrom(
-        address _from,
-        address _to,
-        uint256 _tokenId
-    ) public override {
+    function transferFrom(address _from, address _to, uint256 _tokenId) public override {
         if (!_operatorApprovals[msg.sender][_to]) {
             revert Drop__Unauthorized();
         }
@@ -117,16 +98,11 @@ contract Drop is ERC721, ERC165, ERC721TokenReceiver, ERC721Metadata {
         emit Approval(owner, _approved, _tokenId);
     }
 
-    function isApprovedForAll(
-        address _owner,
-        address _operator
-    ) public view override returns (bool) {
+    function isApprovedForAll(address _owner, address _operator) public view override returns (bool) {
         return _operatorApprovals[_owner][_operator];
     }
 
-    function getApproved(
-        uint256 _tokenId
-    ) public view override returns (address) {
+    function getApproved(uint256 _tokenId) public view override returns (address) {
         if (_owners[_tokenId] == address(0)) {
             revert Drop__InvalidToken();
         }
@@ -134,10 +110,7 @@ contract Drop is ERC721, ERC165, ERC721TokenReceiver, ERC721Metadata {
         return _tokenApprovals[_tokenId];
     }
 
-    function setApprovalForAll(
-        address _operator,
-        bool _approved
-    ) public override {
+    function setApprovalForAll(address _operator, bool _approved) public override {
         if (_operator == msg.sender) {
             revert Drop__SelfApproval();
         }
@@ -161,19 +134,12 @@ contract Drop is ERC721, ERC165, ERC721TokenReceiver, ERC721Metadata {
         address tokenOwner = ownerOf(_tokenId);
 
         string memory baseURI = _baseURI();
-        return
-            bytes(baseURI).length > 0
-                ? string.concat(baseURI, _tokenId.toString())
-                : "";
+        return bytes(baseURI).length > 0 ? string.concat(baseURI, _tokenId.toString()) : "";
 
         return _tokenURIs[_tokenId];
     }
 
-    function _transfer(
-        address _from,
-        address _to,
-        uint256 _tokenId
-    ) internal virtual {
+    function _transfer(address _from, address _to, uint256 _tokenId) internal virtual {
         if (ownerOf(_tokenId) != _from) {
             revert Drop__Unauthorized();
         }
@@ -190,21 +156,13 @@ contract Drop is ERC721, ERC165, ERC721TokenReceiver, ERC721Metadata {
         emit Transfer(_from, _to, _tokenId);
     }
 
-    function _checkOnERC721Received(
-        address _from,
-        address _to,
-        uint256 _tokenId,
-        bytes memory _data
-    ) internal view returns (bool) {
+    function _checkOnERC721Received(address _from, address _to, uint256 _tokenId, bytes memory _data)
+        internal
+        view
+        returns (bool)
+    {
         if (_to.code.length > 0) {
-            try
-                ERC721TokenReceiver(_to).onERC721Received(
-                    msg.sender,
-                    _from,
-                    _tokenId,
-                    _data
-                )
-            returns (bytes4 retval) {
+            try ERC721TokenReceiver(_to).onERC721Received(msg.sender, _from, _tokenId, _data) returns (bytes4 retval) {
                 return retval == ERC721TokenReceiver.onERC721Received.selector;
             } catch {
                 return false;
